@@ -4,8 +4,9 @@ const cors = require('cors')
 const notFound = require('./middlewares/notFound')
 const errorMiddleware = require('./middlewares/error')
 const authRoute = require('./routes/auth-route')
-const todoRoute = require('./routes/todo-route')
 const borrowRoute = require('./routes/borrows-route')
+const bookRoute = require('./routes/book-route')
+const memberRoute = require('./routes/member-route')
 
 const app = express()
 
@@ -14,8 +15,9 @@ app.use(express.json())
 
 // service
 app.use('/auth', authRoute)
-app.use('/todos', todoRoute)
 app.use('/borrow', borrowRoute)
+app.use('/book', bookRoute)
+app.use('/member', memberRoute)
 
 // notFound
 app.use( notFound )

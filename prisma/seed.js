@@ -12,8 +12,8 @@ const userData = [
 
 
 const memberData = [
-  { userId: 1, memberIdCard: 'member_id_1', address: 'address_1'},
-  { userId: 2, memberIdCard: 'member_id_2', address: 'address_2' },
+  { userId: 1, memberIdCard: 'member_id_1', name: 'dew',address: 'address_1'},
+  { userId: 2, memberIdCard: 'member_id_2', name: 'dew',address: 'address_2' },
 ];
 
 const bookData = [

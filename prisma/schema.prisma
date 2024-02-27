@@ -23,26 +23,25 @@ model Member {
   id           Int    @id @default(autoincrement())
   userId       Int
   memberIdCard String
+  name         String
   address      String
   user         User   @relation(fields: [userId], references: [id])
 }
-
 
 model Book {
   id        Int      @id @default(autoincrement())
   title     String
   author    String
   genre     String
-  pageCount Int
+  pageCount Int?
   borrows   Borrow[]
 }
-
 
 model Borrow {
   id         Int      @id @default(autoincrement())
   bookId     Int
   userId     Int
-  borrowDate DateTime
+  borrowDate DateTime @default(now())
   status     String
   book       Book     @relation(fields: [bookId], references: [id])
   user       User     @relation(fields: [userId], references: [id])

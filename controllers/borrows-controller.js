@@ -1,53 +1,95 @@
 const db = require('../models/db');
 
-exports.borrowBook = async (req, res, next) => {
-  const { memberId, bookId } = req.body;
+exports.getBorrows = async (req, res, next) => {
   try {
+    const borrows = await db.borrow.findMany();
+    res.json(borrows);
+  } catch (err) {
+    next(err);
+  }
+};
 
-    const book = await db.books.findUnique({ where: { BookID: bookId } });
-    if (!book) {
-      throw new Error('Book not found');
+exports.getBorrowById = async (req, res, next) => {
+  try {
+    const { borrowingId } = req.params;
+    const borrow = await db.borrow.findUnique({
+      where: { id: +borrowingId },
+    });
+    if (!borrow) {
+      return res.status(404).json({ msg: 'ไม่พบข้อมูลการยืมคืน' });
     }
+    res.json(borrow);
+  } catch (err) {
+    next(err);
+  }
+};
 
-    const availableForBorrow = book.Borrows.length === 0 || book.Borrows.every(borrow => borrow.Status === 'Returned');
-    if (!availableForBorrow) {
-      throw new Error('Book is not available for borrowing');
-    }
+exports.borrowBook = async (req, res, next) => {
+  try {
+    const { memberId, bookId } = req.body;
+    const bookIdNumber = parseInt(bookId, 10);
 
-    const borrowRecord = await db.borrows.create({
+    const borrowRecord = await db.borrow.create({
       data: {
-        MemberID: memberId,
-        BookID: bookId,
-        BorrowDate: new Date(),
-        Status: 'Borrowed',
+        user: { connect: { id: +memberId } },
+        book: { connect: { id: bookIdNumber } },
+        status: 'ยืม',
+        borrowDate: new Date().toISOString(),
       },
     });
 
-    res.json({ msg: 'Book borrowed successfully', result: borrowRecord });
+    res.json({ msg: 'ยืมหนังสือเรียบร้อยแล้ว', result: borrowRecord });
   } catch (err) {
     next(err);
   }
 };
 
 exports.returnBook = async (req, res, next) => {
-  const { borrowingId } = req.params;
   try {
+    const { borrowingId } = req.params;
 
-    const borrowingRecord = await db.borrows.findUnique({ where: { BorrowingID: +borrowingId } });
-    if (!borrowingRecord) {
-      throw new Error('Borrowing record not found');
-    }
-
-    const updatedBorrowRecord = await db.borrows.update({
-      where: { BorrowingID: +borrowingId },
+    const updatedBorrowRecord = await db.borrow.update({
+      where: { id: +borrowingId },
       data: {
-        ReturnDate: new Date(),
-        Status: 'Returned',
+        returnDate: new Date().toISOString(),
+        status: 'คืน',
       },
     });
 
-    res.json({ msg: 'Book returned successfully', result: updatedBorrowRecord });
+    res.json({ msg: 'คืนหนังสือสำเร็จแล้ว', result: updatedBorrowRecord });
   } catch (err) {
     next(err);
   }
 };
+
+exports.updateBorrow = async (req, res, next) => {
+  try {
+    const { borrowingId } = req.params;
+    const { status } = req.body;
+
+    const updatedBorrowRecord = await db.borrow.update({
+      where: { id: +borrowingId },
+      data: { status },
+    });
+
+    res.json({ msg: 'อัพเดตข้อมูลการยืมคืนสำเร็จ', result: updatedBorrowRecord });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteBorrow = async (req, res, next) => {
+  try {
+    const { borrowingId } = req.params;
+
+    await db.borrow.delete({
+      where: { id: +borrowingId },
+    });
+
+    res.json({ msg: 'ลบข้อมูลการยืมคืนสำเร็จ' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
