@@ -16,16 +16,17 @@ model User {
   password String
   email    String
   borrows  Borrow[]
-  Member   Member[]
+  members  Member[]
 }
 
 model Member {
-  id           Int    @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   userId       Int
   memberIdCard String
   name         String
   address      String
-  user         User   @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
+  borrows      Borrow[]
 }
 
 model Book {
@@ -34,15 +35,18 @@ model Book {
   author    String
   genre     String
   pageCount Int?
+  image     String?
   borrows   Borrow[]
 }
 
 model Borrow {
   id         Int      @id @default(autoincrement())
   bookId     Int
-  userId     Int
+  memberId   Int 
   borrowDate DateTime @default(now())
   status     String
   book       Book     @relation(fields: [bookId], references: [id])
-  user       User     @relation(fields: [userId], references: [id])
+  member     Member   @relation(fields: [memberId], references: [id]) 
+  User       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
 }

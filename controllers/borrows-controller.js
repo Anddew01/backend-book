@@ -31,7 +31,7 @@ exports.borrowBook = async (req, res, next) => {
 
     const borrowRecord = await db.borrow.create({
       data: {
-        user: { connect: { id: +memberId } },
+        member: { connect: { id: +memberId } },
         book: { connect: { id: bookIdNumber } },
         status: 'ยืม',
         borrowDate: new Date().toISOString(),
@@ -91,5 +91,3 @@ exports.deleteBorrow = async (req, res, next) => {
     next(err);
   }
 };
-
-
